@@ -1,0 +1,7 @@
+/vendor/
+/node_modules/
+*.log
+*.cache
+.DS_Store
+/data/*.json
+.env
