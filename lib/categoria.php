@@ -16,7 +16,7 @@ function listarCategorias(): array
     }
 }
 
-function inserirCategoria(string $nome, string $descricao = null): bool
+function inserirCategoria(string $nome, string $descricao): bool
 {
     try {
         $conn = new PDOConnection();

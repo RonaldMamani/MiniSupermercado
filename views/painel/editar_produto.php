@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($pode_editar || $_SESSION['tipo_perfil'] == 'admin') {
         $id_produto = filter_input(INPUT_POST, 'id_produto', FILTER_VALIDATE_INT);
         $id_categoria = filter_input(INPUT_POST, 'id_categoria', FILTER_VALIDATE_INT);
-        $nome_produto = filter_input(INPUT_POST, 'nome_produto', FILTER_SANITIZE_STRING);
+        $nome_produto = filter_input(INPUT_POST, 'nome_produto');
         $preco = filter_input(INPUT_POST, 'preco', FILTER_VALIDATE_FLOAT);
         $quantidade = filter_input(INPUT_POST, 'quantidade', FILTER_VALIDATE_INT);
 

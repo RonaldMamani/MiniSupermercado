@@ -9,8 +9,8 @@ require_once __DIR__ . '/lib/auth.php';
 $error_message = ''; 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
+    $username = filter_input(INPUT_POST, 'username');
+    $password = filter_input(INPUT_POST, 'password');
 
     $user_data = autenticarUser($username, $password);
 

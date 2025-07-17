@@ -10,6 +10,17 @@ class SQLQueries
     const PRODUCT_SELECT_ALL_BY_ID = "SELECT p.id_produto, c.id_categoria, c.nome_categoria, p.nome_produto, p.preco, p.quantidade, p.existe FROM " . TB_PR . " p JOIN " . TB_CT . " c ON p.id_categoria = c.id_categoria WHERE p.existe = TRUE ORDER BY p.id_produto ASC";
     const PRODUCT_SELECT_BY_ID = "SELECT p.id_produto, c.id_categoria, c.nome_categoria, p.nome_produto, p.preco, p.quantidade, p.existe FROM " . TB_PR . " p JOIN " . TB_CT . " c ON p.id_categoria = c.id_categoria WHERE p.id_produto = :id_produto AND p.existe = TRUE";
     const PRODUCT_INSERT = "INSERT INTO " . TB_PR . " (id_categoria, nome_produto, preco, quantidade, existe) VALUES (:id_categoria, :nome_produto, :preco, :quantidade, TRUE)";
+    const PRODUCT_CHECK_EXISTS_BY_NAME_AND_PRICE = "SELECT id_produto, nome_produto, preco, quantidade, id_categoria, existe FROM " . TB_PR . " WHERE nome_produto = :nome_produto AND preco = :preco";
+    const PRODUCT_REACTIVATE = "UPDATE " . TB_PR . " SET 
+                                id_categoria = :id_categoria, 
+                                nome_produto = :nome_produto, 
+                                preco = :preco, 
+                                quantidade = :quantidade, 
+                                existe = TRUE 
+                              WHERE id_produto = :id_produto";
+    const PRODUCT_INSERT_FULL = "INSERT INTO " . TB_PR . " 
+                                 (id_categoria, nome_produto, preco, quantidade, existe) 
+                                 VALUES (:id_categoria, :nome_produto, :preco, :quantidade, TRUE)";
     const PRODUCT_UPDATE = "UPDATE " . TB_PR . " SET id_categoria = :id_categoria, nome_produto = :nome_produto, preco = :preco, quantidade = :quantidade WHERE id_produto = :id_produto";
     const PRODUCT_LOGICAL_DELETE = "UPDATE " . TB_PR . " SET existe = FALSE WHERE id_produto = :id_produto";
     const PRODUCT_UPDATE_QUANTITY = "UPDATE " . TB_PR . " SET quantidade = quantidade - :quantidade_vendida_1 WHERE id_produto = :id_produto AND quantidade >= :quantidade_vendida_2 AND existe = TRUE";
@@ -29,5 +40,6 @@ class SQLQueries
     // Permissões
     const PERMISSION_CHECK_ACCESS = "SELECT COUNT(*) FROM " . TB_SL . " WHERE id_perfil = :id_perfil AND nome_solicitacao = :nome_solicitacao AND status = 'aprovado'";
     const PERMISSION_BLOCK_ACCESS = "UPDATE " . TB_SL . " SET status = 'bloqueado' WHERE id_solicitacao = :id_solicitacao";
+
 }
 ?>

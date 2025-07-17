@@ -25,26 +25,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'adicionar_produto') {
         if ($pode_editar) {
             $id_categoria = filter_input(INPUT_POST, 'id_categoria', FILTER_VALIDATE_INT);
-            $nome_produto = filter_input(INPUT_POST, 'nome_produto', FILTER_SANITIZE_STRING);
+            $nome_produto = filter_input(INPUT_POST, 'nome_produto');
             $preco = filter_input(INPUT_POST, 'preco', FILTER_VALIDATE_FLOAT);
             $quantidade = filter_input(INPUT_POST, 'quantidade', FILTER_VALIDATE_INT);
 
             if ($id_categoria && $nome_produto && $preco !== false && $quantidade !== false && $quantidade >= 0) {
-                if (inserirProduto($id_categoria, $nome_produto, $preco, $quantidade)) {
-                    $_SESSION['message'] = ['type' => 'success', 'text' => 'Produto "' . htmlspecialchars($nome_produto) . '" adicionado com sucesso!'];
+                
+                // === LÓGICA ATUALIZADA: VERIFICAR, REATIVAR OU INSERIR ===
+                $existing_product = verificarProdutoExiste($nome_produto, $preco);
+                $operacao_sucesso = false;
+                $mensagem_sucesso = '';
+                $mensagem_erro = '';
+
+                if ($existing_product) {
+                    // Produto com o mesmo nome e preço encontrado
+                    if ($existing_product['existe'] == 0) {
+                        // Produto existe, mas está inativo: reativar
+                        $operacao_sucesso = reativarProduto(
+                            $existing_product['id_produto'], 
+                            $id_categoria, 
+                            $nome_produto, 
+                            $preco, 
+                            $quantidade
+                        );
+                        if ($operacao_sucesso) {
+                            $mensagem_sucesso = 'Produto "' . htmlspecialchars($nome_produto) . '" reativado e dados atualizados com sucesso!';
+                        } else {
+                            $mensagem_erro = 'Erro ao reativar o produto "' . htmlspecialchars($nome_produto) . '".';
+                        }
+                    } else {
+                        // Produto existe e está ativo: impedir criação
+                        $_SESSION['message'] = [
+                            'type' => 'info', 
+                            'text' => 'O produto "' . htmlspecialchars($nome_produto) . '" com o preço R$' . number_format($preco, 2, ',', '.') . ' já existe e está ativo no sistema (ID: ' . $existing_product['id_produto'] . ').'
+                        ];
+                    }
                 } else {
-                    $_SESSION['message'] = ['type' => 'danger', 'text' => 'Erro ao adicionar produto.'];
+                    // Produto não existe: inserir como novo
+                    $operacao_sucesso = inserirProduto($id_categoria, $nome_produto, $preco, $quantidade);
+                    if ($operacao_sucesso) {
+                        $mensagem_sucesso = 'Produto "' . htmlspecialchars($nome_produto) . '" criado com sucesso!';
+                    } else {
+                        $mensagem_erro = 'Erro ao criar o produto "' . htmlspecialchars($nome_produto) . '".';
+                    }
                 }
+
+                if ($operacao_sucesso) {
+                    $_SESSION['message'] = ['type' => 'success', 'text' => $mensagem_sucesso];
+                } elseif (!empty($mensagem_erro)) {
+                    $_SESSION['message'] = ['type' => 'danger', 'text' => $mensagem_erro];
+                }
+
             } else {
-                $_SESSION['message'] = ['type' => 'danger', 'text' => 'Dados de produto inválidos.'];
+                $_SESSION['message'] = ['type' => 'danger', 'text' => 'Dados de produto inválidos. Por favor, verifique se todos os campos estão preenchidos corretamente e a quantidade é um número positivo.'];
             }
         } else {
             $_SESSION['message'] = ['type' => 'danger', 'text' => 'Você não tem permissão para adicionar produtos.'];
         }
     } elseif (isset($_POST['action']) && $_POST['action'] === 'adicionar_categoria') {
         if ($pode_editar) {
-            $nome_categoria = filter_input(INPUT_POST, 'nome_nova_categoria', FILTER_SANITIZE_STRING);
-            $descricao_categoria = filter_input(INPUT_POST, 'descricao_nova_categoria', FILTER_SANITIZE_STRING);
+            $nome_categoria = filter_input(INPUT_POST, 'nome_nova_categoria');
+            $descricao_categoria = filter_input(INPUT_POST, 'descricao_nova_categoria');
 
             if ($nome_categoria) {
                 if (inserirCategoria($nome_categoria, $descricao_categoria)) {
@@ -64,13 +105,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 
-// Processamento da exclusão (GET request)
+// Processamento da exclusão
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'deletar_produto') {
     if ($pode_editar) {
         $id_produto = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
         if ($id_produto) {
             if (deletarProdutoLogico($id_produto)) {
-                $_SESSION['message'] = ['type' => 'success', 'text' => 'Produto deletado com sucesso!'];
+                $_SESSION['message'] = ['type' => 'success', 'text' => 'Produto deletado (desativado) com sucesso!'];
             } else {
                 $_SESSION['message'] = ['type' => 'danger', 'text' => 'Erro ao deletar produto.'];
             }
@@ -151,6 +192,7 @@ $categorias = listarCategorias();
                                     <div class="mb-3">
                                         <label for="id_categoria" class="form-label">Categoria:</label>
                                         <select class="form-select" id="id_categoria" name="id_categoria" required>
+                                            <option value="">Selecione uma categoria</option>
                                             <?php if (!empty($categorias)): ?>
                                                 <?php foreach ($categorias as $categoria): ?>
                                                     <option value="<?= htmlspecialchars($categoria['id_categoria']) ?>">

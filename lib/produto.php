@@ -51,11 +51,46 @@ function inserirProduto(int $id_categoria, string $nome_produto, float $preco, i
             ':preco' => $preco,
             ':quantidade' => $quantidade
         ];
-        $conn->run(SQLQueries::PRODUCT_INSERT, $params);
+        $conn->run(SQLQueries::PRODUCT_INSERT_FULL, $params);
         return true;
     } catch (Exception $e) {
-        error_log("Erro ao inserir produto: " . $e->getMessage());
+        error_log("Erro ao inserir novo produto: " . $e->getMessage());
         return false;
+    }
+}
+
+function reativarProduto(int $id_produto, int $id_categoria, string $nome_produto, float $preco, int $quantidade): bool
+{
+    try {
+        $conn = new PDOConnection();
+        $params = [
+            ':id_categoria' => $id_categoria,
+            ':nome_produto' => $nome_produto,
+            ':preco' => $preco,
+            ':quantidade' => $quantidade,
+            ':id_produto' => $id_produto
+        ];
+        $conn->run(SQLQueries::PRODUCT_REACTIVATE, $params);
+        return true;
+    } catch (Exception $e) {
+        error_log("Erro ao reativar produto: " . $e->getMessage());
+        return false;
+    }
+}
+
+function verificarProdutoExiste(string $nome_produto, float $preco): ?array
+{
+    try {
+        $conn = new PDOConnection();
+        $params = [
+            ':nome_produto' => $nome_produto,
+            ':preco' => $preco
+        ];
+        $result = $conn->run(SQLQueries::PRODUCT_CHECK_EXISTS_BY_NAME_AND_PRICE, $params);
+        return $result[0] ?? null;
+    } catch (Exception $e) {
+        error_log("Erro ao verificar existência de produto: " . $e->getMessage());
+        return null;
     }
 }
 
