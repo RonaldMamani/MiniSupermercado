@@ -3,8 +3,7 @@
 class SQLQueries
 {
     // Tabelas
-
-    // Autenticação e Usuários
+    //Usuários
     const AUTH_GET_USER_BY_USERNAME = "SELECT u.id_usuario, u.username, u.senha, p.tipo_perfil AS tipo_perfil_do_perfil, p.id_perfil FROM " . TB_US . " u JOIN " . TB_PF . " p ON u.id_usuario = p.id_usuario WHERE u.username = :username AND u.ativo = TRUE";
 
     //Estoque
@@ -50,7 +49,6 @@ class SQLQueries
     // Clientes
     const CLIENTE_SELECT_ALL = "SELECT id_cliente, nome, email, data_cadastro, cpf, rg FROM " . TB_CL . " ORDER BY nome ASC";
     const CLIENTE_SELECT_BY_ID = "SELECT id_cliente, nome, email, data_cadastro, cpf, rg FROM " . TB_CL . " WHERE id_cliente = :id_cliente";
-
 
     // Vendas
     const VENDA_INSERT_WITH_CLIENT = "INSERT INTO " . TB_VD . " (id_usuario, id_cliente, data_venda, total) VALUES (:id_usuario, :id_cliente, NOW(), :total)";

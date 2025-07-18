@@ -31,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($id_categoria && $nome_produto && $preco !== false && $quantidade !== false && $quantidade >= 0) {
                 
-                // === LÓGICA ATUALIZADA: VERIFICAR, REATIVAR OU INSERIR ===
                 $existing_product = verificarProdutoExiste($nome_produto, $preco);
                 $operacao_sucesso = false;
                 $mensagem_sucesso = '';

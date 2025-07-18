@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
 $tipo_perfil = $_SESSION['tipo_perfil'];
 $id_perfil_logado = $_SESSION['id_perfil'];
 
-// Determina o painel ativo para destacar no menu
 $painel = $_GET['painel'] ?? ($tipo_perfil == 'admin' ? 'admin' : $tipo_perfil);
 
 ?>
