@@ -38,9 +38,13 @@ if (file_exists($envFile)) {
 
     define('TB_US', getenv('TB_US'));
     define('TB_PF', getenv('TB_PF'));
+    define('TB_ES', getenv('TB_ES'));
     define('TB_PR', getenv('TB_PR'));
     define('TB_CT', getenv('TB_CT'));
     define('TB_SL', getenv('TB_SL'));
+    define('TB_CL', getenv('TB_CL'));
+    define('TB_VD', getenv('TB_VD'));
+    define('TB_VP', getenv('TB_VP'));
 
     foreach ($envKeys as $envKey) {
         $envValue = getenv($envKey);
